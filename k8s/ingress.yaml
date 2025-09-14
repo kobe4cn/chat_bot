@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-api
+  namespace: ai
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # 如使用 cert-manager 自动签发证书，取消以下注释并按需配置：
+    # cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts:
+        - api.example.com
+      secretName: ai-api-tls
+  rules:
+    - host: api.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-api
+                port:
+                  number: 80

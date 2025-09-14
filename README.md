@@ -12,6 +12,19 @@
   - 生成证书并写入 .env：`python scripts/generate_self_signed_cert.py`
   - 运行：`python server.py`
 
+## Docker 打包与运行
+- 构建镜像（示例使用 Docker Hub 用户名 `yourname` 与版本 `0.1.0`）
+  - `docker build -t yourname/ai-api-example:0.1.0 .`
+- 本地运行
+  - `docker run --rm -p 8000:8000 -e DASHSCOPE_API_KEY=sk-... yourname/ai-api-example:0.1.0`
+- 推送镜像（Docker Hub）
+  - `docker login`
+  - `docker push yourname/ai-api-example:0.1.0`
+- 推送镜像（GHCR）
+  - `echo $GHCR_TOKEN | docker login ghcr.io -u <USER> --password-stdin`
+  - `docker tag yourname/ai-api-example:0.1.0 ghcr.io/<ORG>/ai-api-example:0.1.0`
+  - `docker push ghcr.io/<ORG>/ai-api-example:0.1.0`
+
 ## API 一览
 - `GET /health` 健康检查
 - `POST /chat` 标准回复（JSON：`{message, session_id}`）
@@ -44,4 +57,4 @@
 ## 更多文档
 - 使用与启动手册：`spec/usage.md`
 - 升级与实现说明：`spec/upgrade.md`
-
+ - Kubernetes 部署指南：`spec/k8s.md`

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-api-config
+  namespace: ai
+data:
+  # 允许的跨域来源（开发示例）；生产按需收紧
+  allowed_origins: |-
+    ["https://your-frontend.example.com"]
+  require_api_key: "true"
+  rate_limit_enabled: "true"
+  rate_limit_by: "api_key"
+  rate_limit_requests: "60"
+  rate_limit_window_s: "60"
+  request_max_body_bytes: "1000000"
+  log_level: "INFO"
+  log_truncate_len: "1000"
+  signed_url_enabled: "true"
+  signed_url_ttl_s: "300"
+  signed_url_clock_skew_s: "30"
+  model_name: "qwen-turbo"
+  temperature: "0.7"
+  history_limit: "10"
