@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>SSE 流式示例（POST）</title>
+  <style>body{font-family:system-ui,Arial,sans-serif;margin:24px;} pre{background:#f7f7f7;padding:12px;border-radius:6px;}</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+  <h1>SSE 流式响应（POST /chat/stream）</h1>
+  <div>
+    <label>服务地址: <input id="base" value="http://localhost:8000" size="32"></label>
+  </div>
+  <div style="margin-top:8px;">
+    <label>Session ID: <input id="sid" value="web-1" size="16"></label>
+  </div>
+  <div style="margin-top:8px;">
+    <textarea id="msg" rows="4" cols="60" placeholder="输入你的消息"></textarea>
+  </div>
+  <div style="margin-top:8px;">
+    <button id="send">发送并流式接收</button>
+  </div>
+  <h3>输出</h3>
+  <pre id="out"></pre>
+
+  <script>
+    const btn = document.getElementById('send');
+    const out = document.getElementById('out');
+
+    btn.onclick = async () => {
+      out.textContent = '';
+      const base = document.getElementById('base').value.replace(/\/$/, '');
+      const sid = document.getElementById('sid').value || 'web-1';
+      const msg = document.getElementById('msg').value || '你好';
+
+      const resp = await fetch(base + '/chat/stream', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg, session_id: sid }),
+      });
+      if (!resp.ok || !resp.body) {
+        out.textContent = '请求失败: ' + resp.status;
+        return;
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const text = decoder.decode(value, { stream: true });
+        out.textContent += text;
+      }
+    };
+  </script>
+</body>
+<!-- 说明：
+  本示例使用 fetch 以 POST 方式发起 SSE 流，浏览器端通过 ReadableStream 增量读取。
+  服务端返回的内容将包含多行 `data: ...` 与结尾的 `event: end`。
+-->
+
